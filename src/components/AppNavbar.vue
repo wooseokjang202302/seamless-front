@@ -27,7 +27,15 @@
             </li>
           </ul>
           <!-- ml-auto 클래스를 추가하여 오른쪽 정렬 -->
-          <button @click="showModal = true" class="btn btn-primary ml-auto">
+          <div v-if="loggedIn" class="btn-group ml-auto">
+            <button class="btn btn-success">Bookmark</button>
+            <button @click="logout" class="btn btn-danger">Logout</button>
+          </div>
+          <button
+            v-else
+            @click="showModal = true"
+            class="btn btn-primary ml-auto"
+          >
             Login
           </button>
         </div>
@@ -77,19 +85,51 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "AppNavbar",
+
   data() {
     return {
       showModal: false,
       email: "",
       password: "",
+      loggedIn: !!localStorage.getItem("accessToken"),
     };
   },
+
   methods: {
     login() {
-      console.log(this.email, this.password);
-      this.showModal = false;
+      const loginData = {
+        email: this.email,
+        password: this.password,
+      };
+
+      axios
+        .post("http://localhost:9000/users/login", loginData)
+        .then((response) => {
+          console.log(response.data);
+          const accessToken = response.data.accessToken;
+          const refreshToken = response.data.refreshToken;
+
+          localStorage.setItem("accessToken", accessToken);
+          localStorage.setItem("refreshToken", refreshToken);
+
+          this.loggedIn = true;
+          this.showModal = false;
+        })
+        .catch((error) => {
+          console.error("로그인에 실패했습니다:", error);
+          alert("회원정보가 맞지 않습니다.");
+        });
+    },
+
+    logout() {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+
+      this.loggedIn = false;
     },
   },
 };
