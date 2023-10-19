@@ -1,26 +1,40 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <AppNavbar />
+  <div class="container-fluid">
+    <div class="row">
+      <NaverMap :centers="centers" />
+      <CenterList :centers="centers" />
+    </div>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import axios from "axios";
+import AppNavbar from "./components/AppNavbar.vue";
+import NaverMap from "./components/NaverMap.vue";
+import CenterList from "./components/CenterList.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    HelloWorld
-  }
-}
+    AppNavbar,
+    NaverMap,
+    CenterList,
+  },
+  data() {
+    return {
+      centers: [],
+    };
+  },
+  mounted() {
+    axios
+      .get("http://localhost:9000/centers")
+      .then((response) => {
+        this.centers = response.data;
+      })
+      .catch((error) => {
+        console.error("센터 데이터를 가져오는데 실패했습니다:", error);
+      });
+  },
+};
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
