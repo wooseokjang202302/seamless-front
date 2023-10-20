@@ -100,6 +100,10 @@ export default {
     };
   },
 
+  created() {
+    this.checkTokenExpiration();
+  },
+
   methods: {
     login() {
       const loginData = {
@@ -138,6 +142,43 @@ export default {
       localStorage.removeItem("email");
 
       this.loggedIn = false;
+    },
+
+    checkTokenExpiration() {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        const decodedToken = jwtDecode(token);
+        const currentTime = Date.now() / 1000;
+
+        if (decodedToken.exp < currentTime) {
+          this.refreshAccessToken();
+        }
+      }
+    },
+
+    refreshAccessToken() {
+      const refreshToken = localStorage.getItem("refreshToken");
+
+      if (!refreshToken) {
+        this.logout();
+        return;
+      }
+
+      axios
+        .post("http://localhost:9000/users/refresh", {
+          refreshToken: refreshToken,
+        })
+        .then((response) => {
+          const newAccessToken = response.data.accessToken;
+          localStorage.setItem("accessToken", newAccessToken);
+        })
+        .catch((error) => {
+          console.error(
+            "리프레시 토큰으로 엑세스 토큰을 발급하는데 실패했습니다:",
+            error
+          );
+          this.logout();
+        });
     },
   },
 };
