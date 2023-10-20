@@ -86,6 +86,7 @@
 
 <script>
 import axios from "axios";
+import jwtDecode from "jwt-decode";
 
 export default {
   name: "AppNavbar",
@@ -109,7 +110,6 @@ export default {
       axios
         .post("http://localhost:9000/users/login", loginData)
         .then((response) => {
-          console.log(response.data);
           const accessToken = response.data.accessToken;
           const refreshToken = response.data.refreshToken;
 
@@ -118,16 +118,24 @@ export default {
 
           this.loggedIn = true;
           this.showModal = false;
+
+          const token = localStorage.getItem("accessToken");
+          const decodedToken = jwtDecode(token);
+
+          localStorage.setItem("userId", decodedToken.sub);
+          localStorage.setItem("email", decodedToken.email);
         })
         .catch((error) => {
           console.error("로그인에 실패했습니다:", error);
-          alert("회원정보가 맞지 않습니다.");
+          alert("로그인에 실패했습니다.");
         });
     },
 
     logout() {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("email");
 
       this.loggedIn = false;
     },
