@@ -10,10 +10,18 @@
           >홈페이지</a
         >
         <button
-          @click="bookmarkCenter(center.id)"
+          v-if="isBookmarked(center.id)"
+          @click="deleteBookmark(center.id)"
+          class="btn btn-outline-danger bookmark-btn"
+        >
+          북마크 삭제
+        </button>
+        <button
+          v-else
+          @click="addBookmark(center.id)"
           class="btn btn-outline-primary bookmark-btn"
         >
-          북마크
+          북마크 추가
         </button>
       </li>
     </ul>
@@ -26,10 +34,21 @@ import axios from "axios";
 export default {
   props: {
     centers: Array, // centers 데이터를 props로 받음
+    showingBookmarkedCenters: Boolean,
+  },
+
+  data() {
+    return {
+      bookmarkedCenters: [],
+    };
+  },
+
+  mounted() {
+    this.fetchBookmarked();
   },
 
   methods: {
-    bookmarkCenter(centerId) {
+    addBookmark(centerId) {
       const userId = localStorage.getItem("userId");
 
       if (!userId) {
@@ -46,12 +65,61 @@ export default {
         .post("http://localhost:9000/bookmarks", bookmarkData)
         .then((response) => {
           alert("북마크가 추가되었습니다!");
-          // 이후 필요한 로직을 여기에 추가 (예: 북마크 목록 업데이트, 알림 등)
+
+          // bookmarkedCenters 배열에 해당 centerId 추가
+          if (!this.bookmarkedCenters.includes(centerId)) {
+            this.bookmarkedCenters.push(centerId);
+          }
         })
         .catch((error) => {
-          console.error("Bookmark error:", error);
+          console.error("북마크 추가 실패:", error);
           alert("북마크 추가에 실패했습니다. 다시 시도해주세요.");
         });
+    },
+
+    deleteBookmark(centerId) {
+      const userId = localStorage.getItem("userId");
+
+      if (!userId) {
+        alert("로그인이 필요한 기능입니다.");
+        return;
+      }
+
+      axios
+        .delete(`http://localhost:9000/bookmarks/${userId}/${centerId}`, {
+          data: { userId: userId },
+        })
+        .then((response) => {
+          alert("북마크가 삭제되었습니다!");
+          const index = this.bookmarkedCenters.indexOf(centerId);
+          if (index !== -1) {
+            this.bookmarkedCenters = [
+              ...this.bookmarkedCenters.slice(0, index),
+              ...this.bookmarkedCenters.slice(index + 1),
+            ];
+          }
+        })
+        .catch((error) => {
+          console.error("북마크 삭제 실패", error);
+          alert("북마크 삭제에 실패했습니다.");
+        });
+    },
+
+    fetchBookmarked() {
+      const userId = localStorage.getItem("userId");
+      if (userId) {
+        axios
+          .get(`http://localhost:9000/bookmarks/${userId}`)
+          .then((response) => {
+            this.bookmarkedCenters = response.data.map((center) => center.id);
+          })
+          .catch((error) => {
+            console.error("북마크 목록을 가져오는데 실패했습니다:", error);
+          });
+      }
+    },
+    isBookmarked(centerId) {
+      return this.bookmarkedCenters.includes(centerId);
     },
   },
 };

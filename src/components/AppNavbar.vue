@@ -28,15 +28,20 @@
           </ul>
           <!-- ml-auto 클래스를 추가하여 오른쪽 정렬 -->
           <div v-if="loggedIn" class="btn-group ml-auto">
-            <button class="btn btn-success">Bookmark</button>
-            <button @click="logout" class="btn btn-danger">Logout</button>
+            <button
+              @click="toggleView"
+              :class="isBookmarkView ? 'btn btn-primary' : 'btn btn-success'"
+            >
+              {{ isBookmarkView ? "전체보기" : "북마크" }}
+            </button>
+            <button @click="logout" class="btn btn-danger">로그아웃</button>
           </div>
           <button
             v-else
             @click="showModal = true"
             class="btn btn-primary ml-auto"
           >
-            Login
+            로그인
           </button>
         </div>
       </div>
@@ -47,7 +52,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Login</h5>
+            <h5 class="modal-title">로그인</h5>
             <button @click="showModal = false" type="button" class="close">
               <span>&times;</span>
             </button>
@@ -56,26 +61,26 @@
             <input
               type="text"
               class="form-control"
-              placeholder="Email"
+              placeholder="이메일"
               v-model="email"
             />
             <input
               type="password"
               class="form-control mt-2"
-              placeholder="Password"
+              placeholder="비밀번호"
               v-model="password"
             />
           </div>
           <div class="modal-footer">
             <button @click="login" type="button" class="btn btn-primary">
-              Login
+              로그인
             </button>
             <button
               @click="showModal = false"
               type="button"
               class="btn btn-secondary"
             >
-              Close
+              닫기
             </button>
           </div>
         </div>
@@ -97,6 +102,7 @@ export default {
       email: "",
       password: "",
       loggedIn: !!localStorage.getItem("accessToken"),
+      isBookmarkView: false,
     };
   },
 
@@ -179,6 +185,16 @@ export default {
           );
           this.logout();
         });
+    },
+
+    toggleView() {
+      this.isBookmarkView = !this.isBookmarkView;
+
+      if (this.isBookmarkView) {
+        this.$emit("bookmarkClicked");
+      } else {
+        this.$emit("showAllCenters");
+      }
     },
   },
 };
