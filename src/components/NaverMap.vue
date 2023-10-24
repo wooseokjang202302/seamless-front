@@ -11,6 +11,7 @@ export default {
   data() {
     return {
       naverMap: null,
+      markers: [],
     };
   },
   mounted() {
@@ -24,18 +25,28 @@ export default {
         zoom: 10,
       });
     },
+
     addMarkers() {
       if (!this.centers || !this.naverMap) return;
+
+      // 기존 마커 제거
+      this.markers.forEach((marker) => {
+        marker.setMap(null);
+      });
+      this.markers = [];
+
       this.centers.forEach((center) => {
         if (center.mapx && center.mapy) {
-          new naver.maps.Marker({
+          const marker = new naver.maps.Marker({
             map: this.naverMap,
             position: new naver.maps.LatLng(center.mapy, center.mapx),
           });
+          this.markers.push(marker);
         }
       });
     },
   },
+
   watch: {
     centers(newCenters) {
       this.addMarkers();
