@@ -134,6 +134,8 @@ export default {
 
           localStorage.setItem("userId", decodedToken.sub);
           localStorage.setItem("email", decodedToken.email);
+
+          window.location.reload();
         })
         .catch((error) => {
           console.error("로그인에 실패했습니다:", error);
@@ -148,6 +150,8 @@ export default {
       localStorage.removeItem("email");
 
       this.loggedIn = false;
+
+      window.location.reload();
     },
 
     checkTokenExpiration() {
