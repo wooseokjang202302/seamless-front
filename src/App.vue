@@ -3,6 +3,7 @@
     @bookmarkClicked="fetchBookmarkedCenters"
     @showAllCenters="fetchAllCenters"
     @filterChanged="onFilterChanged"
+    ref="navbar"
   />
   <div class="container-fluid">
     <div class="row">
@@ -10,6 +11,7 @@
       <CenterList
         :centers="filteredCenters"
         :showingBookmarkedCenters="showingBookmarkedCenters"
+        @requireLogin="openLoginModal"
       />
     </div>
   </div>
@@ -96,6 +98,9 @@ export default {
     fetchFilteredCenters(do_si, si_gun_gu) {
       const filteredCenters = this.centers.filter(center => center.do_si === do_si && center.si_gun_gu === si_gun_gu);
       this.centers = filteredCenters;
+
+    openLoginModal() {
+      this.$refs.navbar.showModal = true;
     }
   },
 };
