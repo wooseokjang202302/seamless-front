@@ -24,6 +24,13 @@
           북마크 추가
         </button>
       </li>
+
+      <li v-if="centers.length === 0">
+        <p class="center-content">해당 지역에 센터 정보가 없습니다.</p>
+        <p class="center-content">
+          공유하시고픈 센터가 있다면 test@test.com으로 센터 정보를 공유해주세요.
+        </p>
+      </li>
     </ul>
   </div>
 </template>

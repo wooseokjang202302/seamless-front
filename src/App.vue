@@ -2,12 +2,13 @@
   <AppNavbar
     @bookmarkClicked="fetchBookmarkedCenters"
     @showAllCenters="fetchAllCenters"
+    @filterChanged="onFilterChanged"
   />
   <div class="container-fluid">
     <div class="row">
-      <NaverMap :centers="centers" />
+      <NaverMap :centers="filteredCenters" />
       <CenterList
-        :centers="centers"
+        :centers="filteredCenters"
         :showingBookmarkedCenters="showingBookmarkedCenters"
       />
     </div>
@@ -32,18 +33,27 @@ export default {
     return {
       centers: [],
       showingBookmarkedCenters: false,
+      filter: {
+        do_si: "전체",
+        si_gun_gu: "전체"
+      }
     };
   },
 
-  mounted() {
-    axios
-      .get("http://localhost:9000/centers")
-      .then((response) => {
-        this.centers = response.data;
-      })
-      .catch((error) => {
-        console.error("센터 데이터를 가져오는데 실패했습니다:", error);
+  created() {
+    this.fetchAllCenters();
+  },
+
+  computed: {
+    filteredCenters() {
+      if (this.filter.do_si === "전체") {
+        return this.centers;
+      }
+
+      return this.centers.filter(center => {
+        return center.do_si === this.filter.do_si && (this.filter.si_gun_gu === "전체" || center.si_gun_gu === this.filter.si_gun_gu);
       });
+    }
   },
 
   methods: {
@@ -77,6 +87,16 @@ export default {
           console.error("센터 데이터를 가져오는데 실패했습니다:", error);
         });
     },
+
+    onFilterChanged(filter) {
+      this.filter.do_si = filter.do_si;
+      this.filter.si_gun_gu = filter.si_gun_gu;
+    },
+
+    fetchFilteredCenters(do_si, si_gun_gu) {
+      const filteredCenters = this.centers.filter(center => center.do_si === do_si && center.si_gun_gu === si_gun_gu);
+      this.centers = filteredCenters;
+    }
   },
 };
 </script>
