@@ -52,7 +52,7 @@ export default {
       const userId = localStorage.getItem("userId");
 
       if (!userId) {
-        alert("로그인이 필요한 기능입니다.");
+        this.$emit('requireLogin');
         return;
       }
 
@@ -64,8 +64,6 @@ export default {
       axios
         .post("http://localhost:9000/bookmarks", bookmarkData)
         .then((response) => {
-          alert("북마크가 추가되었습니다!");
-
           // bookmarkedCenters 배열에 해당 centerId 추가
           if (!this.bookmarkedCenters.includes(centerId)) {
             this.bookmarkedCenters.push(centerId);
@@ -73,7 +71,6 @@ export default {
         })
         .catch((error) => {
           console.error("북마크 추가 실패:", error);
-          alert("북마크 추가에 실패했습니다. 다시 시도해주세요.");
         });
     },
 
@@ -81,7 +78,7 @@ export default {
       const userId = localStorage.getItem("userId");
 
       if (!userId) {
-        alert("로그인이 필요한 기능입니다.");
+        this.$emit('requireLogin');
         return;
       }
 
@@ -90,7 +87,6 @@ export default {
           data: { userId: userId },
         })
         .then((response) => {
-          alert("북마크가 삭제되었습니다!");
           const index = this.bookmarkedCenters.indexOf(centerId);
           if (index !== -1) {
             this.bookmarkedCenters = [
@@ -101,7 +97,6 @@ export default {
         })
         .catch((error) => {
           console.error("북마크 삭제 실패", error);
-          alert("북마크 삭제에 실패했습니다.");
         });
     },
 
