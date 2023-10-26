@@ -2,6 +2,7 @@
   <AppNavbar
     @bookmarkClicked="fetchBookmarkedCenters"
     @showAllCenters="fetchAllCenters"
+    ref="navbar"
   />
   <div class="container-fluid">
     <div class="row">
@@ -9,6 +10,7 @@
       <CenterList
         :centers="centers"
         :showingBookmarkedCenters="showingBookmarkedCenters"
+        @requireLogin="openLoginModal"
       />
     </div>
   </div>
@@ -77,6 +79,10 @@ export default {
           console.error("센터 데이터를 가져오는데 실패했습니다:", error);
         });
     },
+
+    openLoginModal() {
+      this.$refs.navbar.showModal = true;
+    }
   },
 };
 </script>
