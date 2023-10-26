@@ -3,6 +3,21 @@
     <nav class="navbar navbar-expand-md custom-navbar mb-4">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">Top navbar</a>
+
+        <div class="filters d-flex justify-content-start mt-2">
+          <div>
+            <select v-model="selectedDo_si" @change="onDo_siChange">
+              <option value="전체">전체</option>
+              <option v-for="do_si in do_siData" :key="do_si">{{ do_si }}</option>
+            </select>
+
+            <select v-model="selectedSi_gun_gu">
+              <option value="전체">전체</option>
+              <option v-for="si_gun_gu in si_gun_guData" :key="si_gun_gu">{{ si_gun_gu }}</option>
+            </select>
+          </div>
+        </div>
+
         <button
           class="navbar-toggler"
           type="button"
@@ -14,19 +29,8 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse" id="navbarCollapse">
-          <ul class="navbar-nav me-auto mb-2 mb-md-0">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Link</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-            </li>
-          </ul>
-          <!-- ml-auto 클래스를 추가하여 오른쪽 정렬 -->
           <div v-if="loggedIn" class="btn-group ml-auto">
             <button
               @click="toggleView"
@@ -92,6 +96,7 @@
 <script>
 import axios from "axios";
 import jwtDecode from "jwt-decode";
+import areaData from "@/assets/area.json";
 
 export default {
   name: "AppNavbar",
@@ -103,11 +108,28 @@ export default {
       password: "",
       loggedIn: !!localStorage.getItem("accessToken"),
       isBookmarkView: false,
+      areas: areaData,
+      do_siData: [],
+      si_gun_guData: [],
+      selectedDo_si: null,
+      selectedSi_gun_gu: null
     };
   },
 
   created() {
     this.checkTokenExpiration();
+    this.do_siData = this.areas.map(area => Object.keys(area)[0]);
+    this.selectedDo_si = "전체";
+    this.onDo_siChange();
+  },
+
+  watch: {
+    selectedSi_gun_gu: {
+        handler(newSi_gun_gu) {
+            this.$emit('filterChanged', { do_si: this.selectedDo_si, si_gun_gu: newSi_gun_gu });
+        },
+        immediate: true
+    }
   },
 
   methods: {
@@ -200,6 +222,19 @@ export default {
         this.$emit("showAllCenters");
       }
     },
+
+    onDo_siChange() {
+      if (this.selectedDo_si === "전체") {
+          this.Si_gun_guData = [];
+          this.selectedSi_gun_gu = "전체";
+      } else {
+          const selectedArea = this.areas.find(area => area[this.selectedDo_si]);
+          this.si_gun_guData = selectedArea[this.selectedDo_si];
+          this.selectedSi_gun_gu = "전체";
+      }
+
+      this.$emit('filterChanged', { do_si: this.selectedDo_si, si_gun_gu: this.selectedSi_gun_gu });
+    }
   },
 };
 </script>
@@ -209,8 +244,8 @@ export default {
 .custom-navbar {
   background-color: white;
 }
-.custom-navbar .navbar-brand,
-.custom-navbar .nav-link {
+
+.custom-navbar .navbar-brand {
   color: black;
 }
 
@@ -223,5 +258,9 @@ export default {
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1040;
+}
+
+.filters select {
+  margin-right: 10px;
 }
 </style>
