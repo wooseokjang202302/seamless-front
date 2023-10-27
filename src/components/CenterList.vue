@@ -8,20 +8,18 @@
         <a v-if="center.homepage" class="center-content" :href="center.homepage"
           >홈페이지</a
         >
-        <button
+        <svg-icon class="bookmark-btn"
           v-if="isBookmarked(center.id)"
+          type="mdi"
+          :path="mdiBookmark"
           @click="deleteBookmark(center.id)"
-          class="btn btn-outline-danger bookmark-btn"
-        >
-          북마크 삭제
-        </button>
-        <button
+        ></svg-icon>
+        <svg-icon class="bookmark-btn"
           v-else
+          type="mdi"
+          :path="mdiBookmarkOutline"
           @click="addBookmark(center.id)"
-          class="btn btn-outline-primary bookmark-btn"
-        >
-          북마크 추가
-        </button>
+        ></svg-icon>
       </li>
 
       <li v-if="centers.length === 0">
@@ -36,8 +34,14 @@
 
 <script>
 import axios from "axios";
+import SvgIcon from '@jamescoyle/vue-icon';
+import { mdiBookmarkOutline, mdiBookmark } from '@mdi/js';
 
 export default {
+  components: {
+    SvgIcon
+  },
+
   props: {
     centers: Array,
     showingBookmarkedCenters: Boolean,
@@ -45,7 +49,9 @@ export default {
 
   data() {
     return {
-      bookmarkedCenters: [],
+      mdiBookmarkOutline: mdiBookmarkOutline,
+      mdiBookmark: mdiBookmark,
+      bookmarkedCenters: []
     };
   },
 
@@ -160,5 +166,6 @@ li:last-child {
   position: absolute;
   right: 10px;
   bottom: 10px;
+  cursor: pointer;
 }
 </style>
