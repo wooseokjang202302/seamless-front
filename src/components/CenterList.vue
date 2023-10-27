@@ -1,7 +1,6 @@
 <template>
   <div id="centerList" class="col-3">
     <ul>
-      <!-- 데이터를 props로 받아 사용 -->
       <li v-for="center in centers" :key="center.id">
         <h5 class="center-content">{{ center.name }}</h5>
         <p class="center-content">주소: {{ center.address }}</p>
@@ -40,7 +39,7 @@ import axios from "axios";
 
 export default {
   props: {
-    centers: Array, // centers 데이터를 props로 받음
+    centers: Array,
     showingBookmarkedCenters: Boolean,
   },
 
@@ -71,7 +70,6 @@ export default {
       axios
         .post("http://localhost:9000/bookmarks", bookmarkData)
         .then((response) => {
-          // bookmarkedCenters 배열에 해당 centerId 추가
           if (!this.bookmarkedCenters.includes(centerId)) {
             this.bookmarkedCenters.push(centerId);
           }
@@ -160,7 +158,7 @@ li:last-child {
 
 .bookmark-btn {
   position: absolute;
-  right: 10px; /* 오른쪽 패딩 */
-  bottom: 10px; /* 아래쪽 패딩 */
+  right: 10px;
+  bottom: 10px;
 }
 </style>
